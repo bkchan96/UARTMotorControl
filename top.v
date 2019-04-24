@@ -20,9 +20,9 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module top(clk, reset, rx, pwm, A, B, C, E, DP);
+module top(clk, reset, rx, pwm, A, B, AStatus, BStatus, C, E, DP);
     input clk, reset, rx;
-    output [1:0] pwm, A, B;
+    output [1:0] pwm, A, B, AStatus, BStatus;
     output [6:0] C;
     output [7:0] E;
     output DP;
@@ -42,7 +42,7 @@ module top(clk, reset, rx, pwm, A, B, C, E, DP);
     UART_RX #(868) u_UART_RX(.i_Clk(clk), .i_RX_Serial(rx), .o_RX_DV(rx_done_bit), .o_RX_Byte(rx_data));
     
     // instantiate drive motor state machine
-    State_Machine u_State_Machine(.clk(clk), .rx_done_bit(rx_done_bit), .rx_data(rx_data), .FMAB(FMAB), .AMAB(AMAB), .MPWM(MPWM));
+    State_Machine u_State_Machine(.clk(clk), .reset(reset), .rx_done_bit(rx_done_bit), .rx_data(rx_data), .FMAB(FMAB), .AMAB(AMAB), .MPWM(MPWM));
     
     // instantiate pwm module
     pwm u_pwm(.clk(clk), .reset(reset), .pw(MPWM), .pwm(pwm_internal));
@@ -60,6 +60,7 @@ module top(clk, reset, rx, pwm, A, B, C, E, DP);
     assign pwm = {pwm_internal, pwm_internal};
     assign {A[1],B[1]} = FMAB;
     assign {A[0],B[0]} = AMAB;
-    
+    assign {AStatus[1],BStatus[1]} = FMAB;
+    assign {AStatus[0],BStatus[0]} = AMAB;
 
 endmodule

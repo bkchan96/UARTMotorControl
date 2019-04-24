@@ -24,7 +24,7 @@ use IEEE.STD_LOGIC_1164.ALL;
 --use IEEE.NUMERIC_STD.ALL;
 
 entity State_Machine is
-    Port ( clk : in std_logic;
+    Port ( clk, reset : in std_logic;
            rx_done_bit : in std_logic; -- rx done bit (goes high for only 1 clock cycle)
            rx_data : in std_logic_vector (7 downto 0); -- rx data in
            FMAB : out std_logic_vector (1 downto 0); -- front motor AB logic
@@ -39,8 +39,10 @@ architecture Behavioral of State_Machine is
     
 begin
     -- start process for receiving data and writing to output pwm
-    process (clk) begin
-        if rising_edge(clk) then
+    process (clk, reset) begin
+        if (reset = '1') then
+            MPWM_internal <= "00000000";
+        elsif rising_edge(clk) then
             if (rx_done_bit = '1') then
                 MPWM_internal <= rx_data;
             else
